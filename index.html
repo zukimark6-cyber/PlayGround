@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <title>Cricket World Cup</title>
+  <style>
+    :*{box-sizing:border-box}*{box-sizing:border-box}
+    :root{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#fff;background:#07152d}
+    body{margin:0;overflow:hidden;background:radial-gradient(circle at 50% 10%,#183c76 0,#0a1c3b 52%,#050d20 100%);height:100dvh;touch-action:none;user-select:none}
+    #game{position:relative;width:100vw;height:100dvh;overflow:hidden}
+    canvas{display:block;width:100%;height:100%}
+    .hud{position:absolute;inset:0;pointer-events:none;padding:env(safe-area-inset-top) 22px env(safe-area-inset-bottom)}
+    .topbar{display:flex;justify-content:space-between;align-items:flex-start;padding-top:18px}
+    .scoreboard{background:linear-gradient(135deg,rgba(3,19,47,.96),rgba(10,42,82,.93));border:1px solid rgba(255,255,255,.18);border-radius:14px;box-shadow:0 8px 30px #02081766;min-width:230px;padding:10px 14px;backdrop-filter:blur(10px)}
+    .brand{display:flex;align-items:center;gap:9px;margin-bottom:6px}.cup{font-size:19px}.brandname{font-size:11px;font-weight:900;letter-spacing:2.2px;color:#74d3ff}.scoreline{display:flex;align-items:end;justify-content:space-between}.score{font-size:34px;font-weight:950;line-height:1}.overs{font-size:13px;color:#aabbd2;margin-left:5px}.target{text-align:right;font-size:11px;color:#bdccdf}.target b{display:block;color:#ffd24d;font-size:16px}
+    .runbar{width:230px;height:5px;background:#ffffff1e;border-radius:5px;margin-top:9px;overflow:hidden}.runbar div{height:100%;width:0%;background:linear-gradient(90,#38dcad,#ffe36a);transition:.35s}
+    .phase{margin-top:12px;text-align:right}.phaseTag{display:inline-block;background:#ffca2e;color:#0a1c3b;border-radius:30px;padding:7px 12px;font-size:11px;font-weight:950;letter-spacing:1.2px}.innings{margin-top:7px;font-size:11px;color:#bdcbe0}
+    .controls{position:absolute;left:22px;right:22px;bottom:22px;display:flex;justify-content:space-between;align-items:end;pointer-events:none}
+    .shots{display:grid;grid-template-columns:repeat(3,62px);gap:8px;pointer-events:auto}.shot{width:62px;height:62px;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:linear-gradient(145deg,#153a72cc,#091d42cc);color:#fff;font-weight:900;box-shadow:0 8px 20px #02081780;cursor:pointer}.shot span{display:block;font-size:9px;color:#9eb7d8;margin-top:2px}.shot.active{border-color:#78d7ff;background:linear-gradient(145deg,#1a65a4,#0d345f);box-shadow:0 0 22px #49baff66}.swing{pointer-events:auto;width:118px;height:118px;border-radius:50%;border:8px solid rgba(255,255,255,.12);background:radial-gradient(circle,#ffe65b 0 44%,#f5a72a 45% 56%,#ca7415 57%);color:#4a2500;font-size:15px;font-weight:1000;box-shadow:0 12px 30px #020817aa,inset 0 2px 8px #fff8;cursor:pointer}.swing:active{transform:scale(.94)}
+    .message{position:absolute;left:50%;top:21%;transform:translate(-50%,-50%) scale(.9);font-size:28px;font-weight:1000;text-shadow:0 3px 12px #03102c;color:#ffe35c;opacity:0;transition:.25s}.message.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    #overlay{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,#07152ddd,#07152d99);z-index:5;transition:.35s}.panel{text-align:center;width:min(560px,calc(100vw - 32px));padding:24px}.logoCup{font-size:64px;filter:drop-shadow(0 8px 15px #020817)}h1{font-size:clamp(38px,7vw,72px);line-height:.92;margin:10px 0 8px;text-transform:uppercase;letter-spacing:-3px;text-shadow:0 7px 20px #020817}.subtitle{color:#81ccff;font-weight:900;letter-spacing:5px;font-size:13px;margin-bottom:24px}.panelCard{background:#091e42dd;border:1px solid #ffffff20;border-radius:18px;padding:16px;margin:18px auto 20px;max-width:420px}.vs{display:flex;align-items:center;justify-content:center;gap:16px}.team{width:110px}.flag{font-size:38px}.teamName{font-size:14px;font-weight:900;margin-top:3px}.vsText{color:#feca43;font-weight:1000}.start{border:0;border-radius:12px;padding:16px 34px;background:linear-gradient(135deg,#ffe36a,#ffad32);color:#402700;font-weight:1000;font-size:16px;cursor:pointer;box-shadow:0 12px 30px #f7a60038}.start:active{transform:translateY(2px)}
+    .hide{opacity:0;pointer-events:none}.fieldNote{position:absolute;right:23px;bottom:154px;background:#06182ed9;border:1px solid #ffffff18;border-radius:9px;padding:7px 10px;font-size:10px;color:#9db2ce}.fieldNote b{color:#fff}
+    @media(max-width:650px){.topbar{padding-top:10px}.hud{padding-left:10px;padding-right:10px}.scoreboard{min-width:176px;padding:8px 10px}.brandname{display:none}.score{font-size:27px}.target b{font-size:13px}.runbar{width:176px}.phase{margin-top:8px}.controls{left:10px;right:10px;bottom:12px}.shots{grid-template-columns:repeat(3,52px);gap:5px}.shot{width:52px;height:52px;font-size:12px}.swing{width:92px;height:92px;border-width:6px}.fieldNote{display:none}.message{top:29%;font-size:23px}}
+  </style>
+</head>
+<body>
+<div id="game"><canvas id="canvas"></canvas><div class="hud">
+  <div class="topbar"><div class="scoreboard"><div class="brand"><div class="cup">🏆</div><div class="brandname">CRICKET WORLD CUP</div></div><div class="scoreline"><div><span class="score" id="score">0/0</span><span class="overs" id="overs">0.0</span></div><div class="target">TARGET <b id="target">130</b></div></div><div class="runbar"><div id="progress"></div></div></div><div class="phase"><div class="phaseTag" id="phaseTag">FINAL</div><div class="innings" id="innings">1st INNINGS</div></div></div>
+  <div class="message" id="message">FOUR!</div><div class="fieldNote">FIELD: <b id="fieldName">BALANCED</b></div>
+  <div class="controls"><div class="shots"><button class="shot active" data-shot="0">DEFEND<span>SAFE</span></button><button class="shot" data-shot="1">DRIVE<span>BALANCED</span></button><button class="shot" data-shot="2">LOFT<span>RISK</span></button></div><button class="swing" id="swing">SWING!</button></div>
+</div><div id="overlay"><div class="panel"><div class="logoCup">🏆</div><h1>Cricket<br>World Cup</h1><div class="subtitle">THE GRAND FINAL</div><div class="panelCard"><div class="vs"><div class="team"><div class="flag">🇮🇳</div><div class="teamName">INDIA</div></div><div class="vsText">VS</div><div class="team"><div class="flag">🇦🇺</div><div class="teamName">AUSTRALIA</div></div></div></div><button class="start" id="start">PLAY FINAL</button></div></div></div>
+<script>
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');let W,H,dpr,started=false;
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
+let score=0,wickets=0,balls=0,selected=1,target=130,active=false,finished=false;
+let ball={x:0,y:0,vx:0,vy:0,state:'idle',t:0,land:0},batsman={swing:0};
+const $=id=>document.getElementById(id);
+function updateHUD(){ $('score').textContent=score+'/'+wickets;$('overs').textContent=Math.floor(balls/6)+'.'+(balls%6);$('target').textContent=target;$('progress').style.width=Math.min(100,score/target*100)+'%'}
+function resetBall(){if(!active||finished)return;balls++;ball.state='bowling';ball.t=0;ball.x=W*.5;ball.y=H*.64;ball.vx=(Math.random()-.5)*W*.018;ball.vy=-H*.0042-Math.random()*H*.0014;ball.swing=0;updateHUD();}
+function pitcherLine(){return {x:W*.5,y:H*.78}}
+function swing(){if(!started||finished)return;if(!active){active=true;resetBall();return} if(ball.state==='bowling'||ball.state==='near'){batsman.swing=1;const timing=1-Math.abs(ball.y-(H*.78))/((H*.78-H*.20));const good=timing>.70&&timing<1.18;if(good){const probs=[.86,.68,.46];const hit=Math.random()<probs[selected];if(hit){let runs=[1,selected===2?6:(Math.random()<.45?4:2),selected===2?(Math.random()<.72?6:4):(Math.random()<.4?4:2)][selected];if(selected===0){runs=Math.random()<.7?1:0}score+=runs;ball.state='hit';ball.vx=(Math.random()-.5)*W*.7;ball.vy=-H*(.18+Math.random()*.22);ball.vx+=(ball.vx<0?-1:1)*H*.05;showMsg(runs===6?'SIX!':runs===4?'FOUR!':runs?'RUN '+runs:'DOT BALL');if(score>=target)end(true)}else{wickets++;ball.state='caught';ball.vx=(Math.random()-.5)*W*.2;ball.vy=-H*.12;showMsg('OUT!');if(wickets>=5)end(false)}}else{showMsg(timing<.70?'TOO EARLY':'TOO LATE')}}}
+function showMsg(text){const m=$('message');m.textContent=text;m.classList.add('show');clearTimeout(showMsg.t);showMsg.t=setTimeout(()=>m.classList.remove('show'),850)}
+function end(won){finished=true;active=false;$('phaseTag').textContent=won?'INDIA WON':'AUSTRALIA WON';$('phaseTag').style.background=won?'#58e2b1':'#ff6e7f';setTimeout(()=>{const o=$('overlay');o.querySelector('h1').innerHTML=won?'INDIA<br>CHAMPIONS!':'AUSTRALIA<br>WIN THE FINAL';o.querySelector('.subtitle').textContent=score+' / '+wickets+'  •  '+Math.floor(balls/6)+'.'+(balls%6)+' OVERS';$('start').textContent='PLAY AGAIN';o.classList.remove('hide')},700)}
+$('start').onclick=()=>{ $('overlay').classList.add('hide');if(finished){score=0;wickets=0;balls=0;finished=false;active=false;ball.state='idle';$('phaseTag').textContent='FINAL';$('phaseTag').style.background='#ffca2e';updateHUD()} started=true;setTimeout(resetBall,600)};
+$('swing').addEventListener('pointerdown',e=>{e.preventDefault();swing()});document.querySelectorAll('.shot').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();document.querySelectorAll('.shot').forEach(x=>x.classList.remove('active'));b.classList.add('active');selected=+b.dataset.shot;$('fieldName').textContent=['ULTRA SAFE','BALANCED','AGGRESSIVE'][selected]}));addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();swing()}if(['Digit1','Digit2','Digit3'].includes(e.code)){document.querySelectorAll('.shot')[+e.code.at(-1)-1].dispatchEvent(new PointerEvent('pointerdown'))}});
+function draw(){ctx.clearRect(0,0,W,H);const grass=ctx.createLinearGradient(0,H*.28,0,H);grass.addColorStop(0,'#74bd63');grass.addColorStop(.35,'#58a84e');grass.addColorStop(1,'#327838');ctx.fillStyle=grass;ctx.fillRect(0,0,W,H);ctx.fillStyle='#2c4e28';ctx.fillRect(0,0,W,H*.2);ctx.fillStyle='#17352c';ctx.fillRect(0,0,W,Math.max(35,H*.12));ctx.fillStyle='#b5a77c';ctx.fillRect(0,H*.12,W,H*.16);ctx.fillStyle='#9ac0df';for(let i=0;i<7;i++)ctx.fillRect(i*W/6-H*.02,H*.08,W/6,H*.04);
+ // stadium stands
+ ctx.fillStyle='#10284a';ctx.fillRect(0,H*.19,W,H*.09);ctx.fillStyle='#ef5b69';for(let i=-1;i<50;i++)ctx.fillRect((i*38+H*.03)%W,H*.20,18,5);ctx.fillStyle='#70a7dc';for(let i=0;i<50;i++)ctx.fillRect((i*31+10)%W,H*.235,14,5);
+ // pitch
+ ctx.save();ctx.translate(W*.5,H*.72);ctx.beginPath();ctx.moveTo(-W*.055,-H*.39);ctx.lineTo(W*.055,-H*.39);ctx.lineTo(W*.16,H*.20);ctx.lineTo(-W*.16,H*.20);ctx.closePath();ctx.fillStyle='#c4ad73';ctx.fill();ctx.strokeStyle='#e7d9a6';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+ // boundary
+ ctx.beginPath();ctx.ellipse(W*.5,H*.67,W*.45,W*.32,0,0,Math.PI*2);ctx.strokeStyle='#eaf5df';ctx.lineWidth=3;ctx.setLineDash([9,10]);ctx.stroke();ctx.setLineDash([]);
+ // fielders
+ ctx.fillStyle='#c38a1b';for(const p of [[.18,.58],[.82,.56],[.29,.46],[.69,.43],[.12,.73],[.88,.70]]){ctx.beginPath();ctx.ellipse(W*p[0],H*p[1],5,9,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f7d65a';ctx.beginPath();ctx.arc(W*p[0],H*p[1]-9,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#c38a1b'}
+ // stumps
+ const px=W*.5,py=H*.74;ctx.fillStyle='#eee6ca';for(let i=-1;i<=1;i++){ctx.fillRect(px+i*7-H*.003,py-15,3,30)}ctx.fillStyle='#d64c55';ctx.fillRect(px-12,py-18,24,3);
+ // batter
+ ctx.save();ctx.translate(px-38,H*.70);ctx.rotate(batsman.swing?-.7:0);ctx.fillStyle='#f2a21a';ctx.beginPath();ctx.arc(0,-38,13,0,Math.PI*2);ctx.fill();ctx.fillStyle='#1761b1';ctx.fillRect(-12,-25,24,42);ctx.fillStyle='#d48f20';ctx.fillRect(-10,-8,20,25);ctx.fillStyle='#b96e18';ctx.fillRect(10,-35,5,55);ctx.restore();if(batsman.swing>.01)batsman.swing*=.85;
+ // bowler and wicketkeeper
+ ctx.fillStyle='#efb82b';ctx.beginPath();ctx.arc(W*.5,H*.32,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#d3ad54';ctx.fillRect(W*.5-7,H*.34,14,30);ctx.fillStyle='#d4ac70';ctx.beginPath();ctx.arc(px+8,H*.58,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffe56c';ctx.fillRect(px+1,H*.61,14,24);
+ // ball
+ if(ball.state!=='idle'){ball.t++;if(ball.state==='bowling'){ball.x+=ball.vx+(W*.5-ball.x)*.006;ball.y-=Math.abs(ball.vy);ball.vy*=.985;if(ball.y<=H*.48)ball.vy=-ball.vy*.55;if(ball.y>=H*.82&&!ball.hit){ball.state='idle';showMsg('DOT BALL');setTimeout(()=>{if(active&&!finished)resetBall()},650)}}else if(ball.state==='hit'||ball.state==='caught'){ball.x+=ball.vx;ball.vy+=H*.007;ball.y+=ball.vy;if(ball.y>H*.88||ball.x<-20||ball.x>W+20){ball.state='idle';setTimeout(()=>{if(active&&!finished)resetBall()},650)}}ctx.fillStyle='#ff6666';ctx.beginPath();ctx.arc(ball.x,ball.y,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ball.x-2,ball.y-2,1.5,0,Math.PI*2);ctx.fill();}
+ requestAnimationFrame(draw)}draw();
+</script>
+</body>
+</html>
